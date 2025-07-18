@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Repair Log</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: calc(100% - 20px); /* Account for padding */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        textarea {
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 80px;
+        }
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        /* Style for messages */
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Machine Repair Log</h1>
+        <form id="repairForm">
+            <div class="form-group">
+                <label for="shift">Shift:</label>
+                <select id="shift" name="shift" required>
+                    <option value="">Select Shift</option>
+                    <option value="Green Day">Green Day</option>
+                    <option value="Green Night">Green Night</option>
+                    <option value="Blue Day">Blue Day</option>
+                    <option value="Blue Night">Blue Night</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="machineNum">Machine #:</label>
+                <select id="machineNum" name="machineNum" required>
+                    <option value="">Select Machine</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="issue">Issue:</label>
+                <select id="issue" name="issue" required>
+                    <option value="">Select Issue</option>
+                    </select>
+            </div>
+
+            <div class="form-group" id="descriptionGroup">
+                <label for="description">Description (related to issue):</label>
+                <textarea id="description" name="description" rows="3" placeholder="Describe the issue in detail..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="actionTaken">Action Taken:</label>
+                <textarea id="actionTaken" name="actionTaken" rows="4" placeholder="Describe the actions taken to fix the machine..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="mechanicName">Mechanic Name:</label>
+                <input type="text" id="mechanicName" name="mechanicName" placeholder="Your Name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="timeStartedMachine">Time Started Machine:</label>
+                <input type="time" id="timeStartedMachine" name="timeStartedMachine" required>
+            </div>
+
+            <button type="submit" class="submit-button">Submit Repair</button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+
+    <script>
+        // *** IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL ***
+        // Ensure the URL is wrapped in single or double quotes!
+        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec'; // e.g., 'https://script.google.com/macros/s/AKfycb.../exec'
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const machineNumSelect = document.getElementById('machineNum');
+            const issueSelect = document.getElementById('issue');
+            const repairForm = document.getElementById('repairForm');
+            const messageDiv = document.getElementById('message');
+
+            // 1. Populate Machine # dropdown (1 to 70)
+            for (let i = 1; i <= 70; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Machine ${i}`;
+                machineNumSelect.appendChild(option);
+            }
+
+            // 2. Populate Issue dropdown (placeholder issues for now)
+            const issues = [
+                "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
+                "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
+                "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
+                "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
+                "Clearance (CLR)", "Connectin Rod Bearing (CRB)", "Index Timing (EIT)",
+                "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
+                "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
+                "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
+                "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
+                "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
+                "Bearing Failure", "Unexpected Stop"
+            ];
+
+            issues.forEach((issue, index) => {
+                const option = document.createElement('option');
+                option.value = issue;
+                option.textContent = issue;
+                issueSelect.appendChild(option);
+            });
+
+            // Optional: Set current date as default for date field
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date').value = `${year}-${month}-${day}`;
+
+            // Function to display messages
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = `message ${type}`;
+                messageDiv.style.display = 'block';
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+
+            // 3. Handle Form Submission
+            repairForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                showMessage('Submitting data...', 'info');
+
+                const formData = {
+                    shift: document.getElementById('shift').value,
+                    date: document.getElementById('date').value,
+                    machineNum: document.getElementById('machineNum').value,
+                    issue: document.getElementById('issue').value,
+                    description: document.getElementById('description').value,
+                    actionTaken: document.getElementById('actionTaken').value,
+                    mechanicName: document.getElementById('mechanicName').value,
+                    timeStartedMachine: document.getElementById('timeStartedMachine').value
+                };
+
+                // Corrected 'try' block and URL string
+                try {
+                    const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, { // URL now in quotes
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    showMessage('Repair log submitted successfully!', 'success');
+                    repairForm.reset();
+                    document.getElementById('date').value = `${year}-${month}-${day}`;
+
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    showMessage('Failed to submit repair log. Please try again.', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
