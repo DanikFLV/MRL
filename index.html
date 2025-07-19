@@ -85,12 +85,151 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        /* Confirmation Overlay Styles */
+        #confirmation-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1002; /* Higher than greeting overlay */
+            flex-direction: column;
+            animation: fadeIn 0.5s;
+        }
+        #confirmation-overlay .confirmation-box {
+            background-color: #ffffff;
+            color: #333;
+            padding: 50px 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            width: 80%;
+            max-width: 450px;
+            font-size: 1.8em;
+            font-weight: bold;
+            transform: scale(0.8); /* Start smaller */
+            animation: popIn 0.5s forwards; /* Animation for popping in */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes popIn {
+            to { transform: scale(1); }
+        }
+        /* Style for the checkmark */
+        #confirmation-overlay .checkmark {
+            display: block;
+            margin: 0 auto 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4CAF50;
+            color: white;
+            line-height: 80px;
+            font-size: 4em; /* Larger checkmark */
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <div id="pin-overlay" style="
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+    ">
+        <div style="
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 80%;
+            max-width: 350px;
+        ">
+            <h2 style="margin-top: 0; color: #333;" id="pin-header-text">Enter PIN</h2>
+            <input type="password" id="pin-input" placeholder="••••" maxlength="4" style="
+                width: calc(100% - 20px);
+                padding: 12px;
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 20px;
+                text-align: center;
+            ">
+            <button id="pin-submit" style="
+                width: 100%;
+                padding: 12px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-size: 18px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            ">Access App</button>
+            <p id="pin-message" style="color: red; margin-top: 15px; display: none;"></p>
+        </div>
+    </div>
+
+    <div id="greeting-overlay" style="
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1001;
+        flex-direction: column;
+    ">
+        <div style="
+            background-color: #4CAF50;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba{0, 0, 0, 0.7};
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            font-size: 2.5em;
+            font-weight: bold;
+        ">
+            <span id="greeting-text">Hello Mechanic!</span>
+        </div>
+    </div>
+
+    <div id="confirmation-overlay">
+        <div class="confirmation-box">
+            <span class="checkmark">&#10003;</span>
+            <p id="confirmation-message">Thank you for your submission!</p>
+        </div>
+    </div>
+
     <div class="container">
         <h1>Machine Repair Log</h1>
         <form id="repairForm">
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="mechanicName">Mechanic Name:</label>
+                <input type="text" id="mechanicName" name="mechanicName" placeholder="Your Name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="timeStartedMachine">Time Started Machine:</label>
+                <input type="time" id="timeStartedMachine" name="timeStartedMachine" required>
+            </div>
+            
             <div class="form-group">
                 <label for="shift">Shift:</label>
                 <select id="shift" name="shift" required>
@@ -100,11 +239,6 @@
                     <option value="Blue Day">Blue Day</option>
                     <option value="Blue Night">Blue Night</option>
                 </select>
-            </div>
-
-            <div class="form-group">
-                <label for="date">Date:</label>
-                <input type="date" id="date" name="date" required>
             </div>
 
             <div class="form-group">
@@ -132,14 +266,7 @@
             </div>
 
             <div class="form-group">
-                <label for="mechanicName">Mechanic Name:</label>
-                <input type="text" id="mechanicName" name="mechanicName" placeholder="Your Name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="timeStartedMachine">Time Started Machine:</label>
-                <input type="time" id="timeStartedMachine" name="timeStartedMachine" required>
-            </div>
+                <label for="mechanicNotes">Mechanic Notes (Optional):</label> <textarea id="mechanicNotes" name="mechanicNotes" rows="3" placeholder="Enter any notes or parts needed here..."></textarea> </div>
 
             <button type="submit" class="submit-button">Submit Repair</button>
             <div id="message" class="message"></div>
@@ -147,17 +274,102 @@
     </div>
 
     <script>
-        // *** IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL ***
-        // Ensure the URL is wrapped in single or double quotes!
-        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec'; // e.g., 'https://script.google.com/macros/s/AKfycb.../exec'
+        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec';
+
+        const MECHANICS = {
+            "2030": "John Johnson",
+            "1500": "Maria Garcia",
+            "4040": "David Lee",
+            "7777": "Sophia Williams",
+            // IMPORTANT: Add/Update your mechanics directly here as "PIN": "Full Name",
+            // You will need to re-copy this file to tablets if you change this list.
+        };
+
+        const REMEMBER_PIN_KEY = "repairAppPin";
+        const REMEMBERED_MECHANIC_NAME_KEY = "repairAppMechanicName";
+        const PIN_TIMEOUT_HOURS = 0;
 
         document.addEventListener('DOMContentLoaded', function() {
             const machineNumSelect = document.getElementById('machineNum');
             const issueSelect = document.getElementById('issue');
             const repairForm = document.getElementById('repairForm');
             const messageDiv = document.getElementById('message');
+            const mechanicNameInput = document.getElementById('mechanicName');
+            const mechanicNotesInput = document.getElementById('mechanicNotes'); // CHANGED: from partsNeededInput
 
-            // 1. Populate Machine # dropdown (1 to 70)
+            // PIN Elements
+            const pinOverlay = document.getElementById('pin-overlay');
+            const pinInput = document.getElementById('pin-input');
+            const pinSubmitButton = document.getElementById('pin-submit');
+            const pinMessage = document.getElementById('pin-message');
+            const pinHeaderText = document.getElementById('pin-header-text');
+
+            // Greeting Overlay Elements
+            const greetingOverlay = document.getElementById('greeting-overlay');
+            const greetingText = document.getElementById('greeting-text');
+
+            // Confirmation Overlay Elements
+            const confirmationOverlay = document.getElementById('confirmation-overlay');
+            const confirmationMessage = document.getElementById('confirmation-message');
+
+
+            // --- PIN LOGIC START ---
+            function showPinScreen(message = '', headerText = 'Enter PIN') {
+                pinMessage.textContent = message;
+                pinMessage.style.display = message ? 'block' : 'none';
+                pinHeaderText.textContent = headerText;
+                pinOverlay.style.display = 'flex';
+                pinInput.value = '';
+                pinInput.focus();
+                localStorage.removeItem(REMEMBER_PIN_KEY);
+                localStorage.removeItem(REMEMBERED_MECHANIC_NAME_KEY);
+            }
+
+            function hidePinScreen(mechanicName) {
+                pinOverlay.style.display = 'none';
+                if (mechanicName) {
+                    mechanicNameInput.value = mechanicName;
+                    mechanicNameInput.readOnly = true;
+                }
+            }
+
+            function showGreeting(name) {
+                greetingText.textContent = `Greetings ${name}!`;
+                greetingOverlay.style.display = 'flex';
+                setTimeout(() => {
+                    greetingOverlay.style.display = 'none';
+                }, 1000);
+            }
+
+            function checkPin() {
+                const enteredPin = pinInput.value;
+                const mechanicName = MECHANICS[enteredPin];
+
+                if (mechanicName) {
+                    hidePinScreen(mechanicName);
+                    if (PIN_TIMEOUT_HOURS > 0) {
+                        localStorage.setItem(REMEMBER_PIN_KEY, Date.now() + (PIN_TIMEOUT_HOURS * 60 * 60 * 1000));
+                        localStorage.setItem(REMEMBERED_MECHANIC_NAME_KEY, mechanicName);
+                    }
+                    showGreeting(mechanicName);
+
+                } else {
+                    showPinScreen('Incorrect PIN. Please try again.');
+                }
+            }
+            
+            showPinScreen();
+
+            pinSubmitButton.addEventListener('click', checkPin);
+            pinInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    checkPin();
+                }
+            });
+            // --- PIN LOGIC END ---
+
+
+            // 1. Populate Machine # dropdown (1 to 70) - UNCHANGED
             for (let i = 1; i <= 70; i++) {
                 const option = document.createElement('option');
                 option.value = i;
@@ -165,19 +377,19 @@
                 machineNumSelect.appendChild(option);
             }
 
-            // 2. Populate Issue dropdown (placeholder issues for now)
+            // 2. Populate Issue dropdown (placeholder issues for now) - UNCHANGED
             const issues = [
-                "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
-                "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
-                "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
-                "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
-                "Clearance (CLR)", "Connectin Rod Bearing (CRB)", "Index Timing (EIT)",
-                "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
-                "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
-                "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
-                "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
-                "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
-                "Bearing Failure", "Unexpected Stop"
+                "Mechanical Failure", "Electrical Issue", "Software Glitch",
+                "Hydraulic Leak", "Pneumatic Problem", "Overheating",
+                "Noise/Vibration", "Jam/Blockage", "Sensor Malfunction",
+                "Calibration Error", "Wear and Tear", "Alignment Issue",
+                "Power Supply Problem", "Motor Fault", "Bearing Failure",
+                "Filter Clogged", "Pressure Loss", "Belt Broken/Slipping",
+                "Lubrication Issue", "Corrosion", "Control System Error",
+                "Safety System Trip", "Communication Error", "Cooling System Failure",
+                "Exhaust System Issue",
+                "Fluid Level Low", "Contamination",
+                "Blade Dull/Damaged", "Noisy Operation", "Unexpected Stop"
             ];
 
             issues.forEach((issue, index) => {
@@ -187,14 +399,20 @@
                 issueSelect.appendChild(option);
             });
 
-            // Optional: Set current date as default for date field
+            // Set current date as default for date field
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             document.getElementById('date').value = `${year}-${month}-${day}`;
 
-            // Function to display messages
+            // Set current time as default for time field
+            const hours = String(today.getHours()).padStart(2, '0');
+            const minutes = String(today.getMinutes()).padStart(2, '0');
+            document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
+
+
+            // Function to display messages - UNCHANGED
             function showMessage(text, type) {
                 messageDiv.textContent = text;
                 messageDiv.className = `message ${type}`;
@@ -204,7 +422,17 @@
                 }, 5000);
             }
 
-            // 3. Handle Form Submission
+            // Function to show confirmation overlay - UNCHANGED
+            function showConfirmationOverlay(message = "Thank you for your submission!") {
+                confirmationMessage.textContent = message;
+                confirmationOverlay.style.display = 'flex';
+                setTimeout(() => {
+                    confirmationOverlay.style.display = 'none';
+                    showPinScreen();
+                }, 3000);
+            }
+
+            // Handle Form Submission - MODIFIED to include mechanicNotes
             repairForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
 
@@ -217,13 +445,13 @@
                     issue: document.getElementById('issue').value,
                     description: document.getElementById('description').value,
                     actionTaken: document.getElementById('actionTaken').value,
-                    mechanicName: document.getElementById('mechanicName').value,
+                    mechanicNotes: mechanicNotesInput.value, // CHANGED: from partsNeeded
+                    mechanicName: mechanicNameInput.value,
                     timeStartedMachine: document.getElementById('timeStartedMachine').value
                 };
 
-                // Corrected 'try' block and URL string
                 try {
-                    const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, { // URL now in quotes
+                    const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: {
@@ -232,13 +460,19 @@
                         body: JSON.stringify(formData)
                     });
 
-                    showMessage('Repair log submitted successfully!', 'success');
+                    showConfirmationOverlay(); 
+                    
                     repairForm.reset();
                     document.getElementById('date').value = `${year}-${month}-${day}`;
+                    document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
 
                 } catch (error) {
                     console.error('Error submitting form:', error);
                     showMessage('Failed to submit repair log. Please try again.', 'error');
+                    setTimeout(() => {
+                        showMessage('', '');
+                        showPinScreen();
+                    }, 5000);
                 }
             });
         });
