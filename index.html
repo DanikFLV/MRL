@@ -295,7 +295,7 @@
 
         const REMEMBER_PIN_KEY = "repairAppPin";
         const REMEMBERED_MECHANIC_NAME_KEY = "repairAppMechanicName";
-        const PIN_TIMEOUT_HOURS = 1000;
+        const PIN_TIMEOUT_HOURS = 10000;
 
         document.addEventListener('DOMContentLoaded', function() {
             const machineNumSelect = document.getElementById('machineNum');
@@ -346,7 +346,7 @@
                 greetingOverlay.style.display = 'flex';
                 setTimeout(() => {
                     greetingOverlay.style.display = 'none';
-                }, 1000);
+                }, 1500);
             }
 
             function checkPin() {
@@ -437,7 +437,7 @@
                 setTimeout(() => {
                     confirmationOverlay.style.display = 'none';
                     showPinScreen();
-                }, 3000);
+                }, 2000);
             }
 
             // Handle Form Submission - MODIFIED to include mechanicNotes
