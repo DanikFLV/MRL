@@ -6,154 +6,8 @@
     <title>Machine Repair Admin Dashboard</title>
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="admin-style.css">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 1200px;
-            margin: 20px auto;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        #loading-message {
-            text-align: center;
-            font-size: 1.2em;
-            color: #666;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 0.9em;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-            position: sticky; /* Make headers sticky for long tables */
-            top: 0;
-            z-index: 1;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        /* Specific styles for DataTables search and pagination controls */
-        .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 15px;
-            text-align: right;
-        }
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 5px 10px;
-            margin: 0 2px;
-            border: 1px solid #ddd;
-            background-color: #f8f8f8;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        /* Admin Password Overlay Styles */
-        #admin-password-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            flex-direction: column;
-        }
-        #admin-password-overlay .password-box {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            width: 80%;
-            max-width: 350px;
-        }
-        #admin-password-overlay h2 {
-            margin-top: 0;
-            color: #333;
-        }
-        #admin-password-overlay input[type="password"] {
-            width: calc(100% - 20px);
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 20px;
-            text-align: center;
-        }
-        #admin-password-overlay button {
-            width: 100%;
-            padding: 12px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #admin-password-overlay button:hover {
-            background-color: #c82333;
-        }
-        #admin-password-message {
-            color: red;
-            margin-top: 15px;
-            display: none;
-        }
-    </style>
 </head>
 <body>
     <div id="admin-password-overlay">
@@ -165,268 +19,40 @@
         </div>
     </div>
 
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading data...</p>
+    </div>
+
     <div class="container" style="display: none;">
         <h1>Machine Repair Log - Admin View</h1>
         <div class="controls">
             <button class="button" id="refreshData">Refresh Data</button>
             <button class="button" id="downloadCsv">Download CSV</button>
+            
+            <div class="month-selector">
+                <label for="logTabs">Select Month:</label>
+                <select id="logTabs" class="button">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
         </div>
         
         <p id="loading-message">Loading data...</p>
 
-        <table id="repair-data-table" class="display">
-            <thead>
-                </thead>
-            <tbody>
-                </tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="repair-data-table" class="display">
+                <thead>
+                    </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
     </div>
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="admin-script.js"></script>
 
-    <script>
-        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec';
-
-        // *** ADMIN PASSWORD CONFIGURATION ***
-        const ADMIN_PASSWORD = "admin"; // <--- SET YOUR ADMIN PASSWORD HERE!
-
-        let dataTableInstance = null;
-        let isFetchingData = false; 
-
-        // Admin password elements
-        const adminPasswordOverlay = document.getElementById('admin-password-overlay');
-        const adminPasswordInput = document.getElementById('admin-password-input');
-        const adminPasswordSubmit = document.getElementById('admin-password-submit');
-        const adminPasswordMessage = document.getElementById('admin-password-message');
-        const mainContainer = document.querySelector('.container');
-
-        // Function to show/hide admin password screen
-        function showAdminPasswordScreen(message = '') {
-            adminPasswordMessage.textContent = message;
-            adminPasswordMessage.style.display = message ? 'block' : 'none';
-            adminPasswordOverlay.style.display = 'flex';
-            adminPasswordInput.value = '';
-            adminPasswordInput.focus();
-            mainContainer.style.display = 'none';
-        }
-
-        function hideAdminPasswordScreen() {
-            adminPasswordOverlay.style.display = 'none';
-            mainContainer.style.display = 'block';
-        }
-
-        // Check admin password
-        function checkAdminPassword() {
-            if (adminPasswordInput.value === ADMIN_PASSWORD) {
-                hideAdminPasswordScreen();
-                fetchAndDisplayAllData(); 
-            } else {
-                showAdminPasswordScreen('Incorrect password.');
-            }
-        }
-
-        // Event listeners for admin password screen
-        adminPasswordSubmit.addEventListener('click', checkAdminPassword);
-        adminPasswordInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                checkAdminPassword();
-            }
-        });
-
-        // This function will fetch and display all data (table only now)
-        async function fetchAndDisplayAllData() {
-            console.log('fetchAndDisplayAllData called.');
-            if (isFetchingData) {
-                console.warn("Already fetching data. Skipping this request.");
-                return;
-            }
-            isFetchingData = true;
-
-            const loadingMessage = document.getElementById('loading-message');
-            loadingMessage.textContent = 'Loading data...';
-            loadingMessage.style.display = 'block';
-
-            // --- Destroy existing DataTable instance ---
-            if (dataTableInstance !== null) {
-                console.log('Destroying existing DataTable instance.');
-                dataTableInstance.destroy();
-                $('#repair-data-table').empty();
-                $('#repair-data-table').append('<thead></thead><tbody></tbody>');
-            }
-            
-            try {
-                // CORRECTED: action parameter is now 'getRepairData' to match Apps Script
-                console.log(`Attempting to fetch data from: ${GOOGLE_SHEET_WEB_APP_URL}?action=getRepairData`);
-                const response = await fetch(`${GOOGLE_SHEET_WEB_APP_URL}?action=getRepairData`);
-                
-                console.log('Fetch response received. Status:', response.status, response.statusText);
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-                }
-
-                const result = await response.json();
-                console.log('JSON result:', result);
-
-                if (result.data && result.data.length > 0) {
-                    console.log('Data received and is not empty. Populating table.');
-                    const allData = result.data;
-                    const headers = Object.keys(allData[0]);
-
-                    // --- DataTables Initialization ---
-                    const columns = headers.map(header => {
-                        let columnDefinition = { title: header, data: header };
-
-                        // Formatting for Date column
-                        if (header === 'Date') {
-                            columnDefinition.render = function(data, type, row) {
-                                if (type === 'display' && data) {
-                                    try {
-                                        const date = new Date(data);
-                                        // Format as MM/DD/YYYY (e.g., 07/18/2025)
-                                        return date.toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit'
-                                        });
-                                    } catch (e) {
-                                        console.error("Error parsing date in DataTables render:", data, e);
-                                        return data; // Return original if parse fails
-                                    }
-                                }
-                                return data;
-                            };
-                        }
-                        // Formatting for Time Started Machine column
-                        if (header === 'Time Started Machine') {
-                            columnDefinition.render = function(data, type, row) {
-                                if (type === 'display' && data) {
-                                    try {
-                                        const date = new Date(data);
-                                        // Format as HH:MM AM/PM (e.g., 04:00 AM)
-                                        return date.toLocaleTimeString('en-US', {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            hour12: true
-                                        });
-                                    } catch (e) {
-                                        console.error("Error parsing time in DataTables render:", data, e);
-                                        return data; // Return original if parse fails
-                                    }
-                                }
-                                return data;
-                            };
-                        }
-
-                        return columnDefinition;
-                    });
-                    
-                    dataTableInstance = $('#repair-data-table').DataTable({
-                        data: allData,
-                        columns: columns,
-                        paging: true,
-                        ordering: true,
-                        info: true,
-                        searching: true
-                    });
-
-                    loadingMessage.textContent = 'Data loaded successfully.';
-                    setTimeout(() => loadingMessage.style.display = 'none', 3000);
-                } else {
-                    console.log('No data or empty data array received.');
-                    loadingMessage.textContent = 'No data available in the sheet.';
-                }
-
-            } catch (error) {
-                console.error('Error fetching or processing data:', error);
-                loadingMessage.textContent = 'Failed to load data. Please check console for errors.';
-                loadingMessage.style.color = 'red';
-            } finally {
-                isFetchingData = false;
-                console.log('fetchAndDisplayAllData finished. isFetchingData set to false.');
-            }
-        }
-
-        // --- Download CSV Logic --- 
-        function downloadCsv() {
-            if (!dataTableInstance) {
-                alert('No data loaded to download!');
-                return;
-            }
-
-            const data = dataTableInstance.rows({ search: 'applied', order: 'applied' }).data().toArray();
-            const headers = dataTableInstance.columns().header().toArray().map(th => th.textContent);
-
-            if (data.length === 0) {
-                alert('No data to download.');
-                return;
-            }
-
-            let csvContent = headers.map(header => `"${header.replace(/"/g, '""')}"`).join(',') + '\n';
-            dataTableInstance.rows({ search: 'applied', order: 'applied' }).every(function() {
-                const rowData = this.data();
-                let rowArray = [];
-                for (let i = 0; i < headers.length; i++) {
-                    const header = headers[i];
-                    let value = rowData[header];
-
-                    if (header === 'Date' && value) {
-                        try {
-                            const date = new Date(value);
-                            value = date.toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit'
-                            });
-                        } catch (e) {
-                            // If parsing fails, use original value
-                        }
-                    } else if (header === 'Time Started Machine' && value) {
-                        try {
-                            const date = new Date(value);
-                            value = date.toLocaleTimeString('en-US', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true
-                            });
-                        } catch (e) {
-                            // If parsing fails, use original value
-                        }
-                    }
-
-                    if (value === null || value === undefined) {
-                        value = '';
-                    }
-                    rowArray.push(`"${String(value).replace(/"/g, '""')}"`);
-                }
-                csvContent += rowArray.join(',') + '\n';
-            });
-
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', 'machine_repair_logs.csv');
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const refreshButton = document.getElementById('refreshData');
-            const downloadCsvButton = document.getElementById('downloadCsv');
-
-            showAdminPasswordScreen(); 
-
-            refreshButton.addEventListener('click', fetchAndDisplayAllData);
-            downloadCsvButton.addEventListener('click', downloadCsv);
-        });
-    </script>
 </body>
 </html>
