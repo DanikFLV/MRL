@@ -1,7 +1,7 @@
 const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec';
 
 // *** ADMIN PASSWORD CONFIGURATION ***
-const ADMIN_PASSWORD = "adminpass";
+const ADMIN_PASSWORD = "admin";
 const ADMIN_REMEMBER_KEY = "adminLoggedIn";
 
 let dataTableInstance = null;
@@ -161,8 +161,8 @@ async function fetchAndDisplayAllData(tabName) {
             const allData = result.data;
             
             const COLUMNS_ORDER = [
-                'Mechanic Name',
                 'Date',
+                'Mechanic Name',
                 'Time Started Machine',
                 'Shift',
                 'Machine #',
