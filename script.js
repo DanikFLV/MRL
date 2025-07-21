@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmationOverlay = document.getElementById('confirmation-overlay');
     const confirmationMessage = document.getElementById('confirmation-message');
 
-    // NEW: Logout Button Element
-    const logoutButton = document.getElementById('logoutButton');
+    // MOVED: Logout Button Element declaration INSIDE DOMContentLoaded
+    const logoutButton = document.getElementById('logoutButton'); 
 
 
     // --- PIN LOGIC START ---
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // 1. Populate Machine # dropdown (1 to 70) - UNCHANGED
-    for (let i = 1; i <= 74; i++) {
+    for (let i = 1; i <= 74; i++) { // Assuming 74 machines now
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Machine ${i}`;
@@ -131,20 +131,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 2. Populate Issue dropdown (placeholder issues for now) - UNCHANGED
-    // 2. Populate Issue dropdown (placeholder issues for now)
-            const issues = [
-                "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
-                "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
-                "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
-                "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
-                "Clearance (CLR)", "Connecting Rod Bearing (CRB)", "Index Timing (EIT)",
-                "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
-                "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
-                "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
-                "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
-                "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
-                "Bearing Failure", "Unexpected Stop"
-
+    const issues = [
+        "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
+        "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
+        "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
+        "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
+        "Clearance (CLR)", "Connecting Rod Bearing (CRB)", "Index Timing (EIT)",
+        "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
+        "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
+        "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
+        "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
+        "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
+        "Bearing Failure", "Unexpected Stop"
     ];
 
     issues.forEach((issue, index) => {
@@ -235,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // NEW: Logout Button Event Listener
+    // NEW: Logout Button Event Listener - Moved inside DOMContentLoaded
     if (logoutButton) { // Ensure button exists before adding listener
         logoutButton.addEventListener('click', function() {
             // Clear the form fields upon logout
