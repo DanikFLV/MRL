@@ -1,13 +1,15 @@
 const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec';
 
 const MECHANICS = {
-    "2030": "Salvador Flores",
-    "1500": "Ivand Adorno",
-    "4040": "Dmitrii Kushnirenko",
-    "7777": "Oleksii Kononenko",
-    "5555": "Dominic Prichard",
-    "6666": "Marice Caunty",
-    "1010": "Cordero Clarke",
+    "0000": "Salvador Flores",
+    "0001": "Ivand Adorno",
+    "0002": "Dmitrii Kushnirenko",
+    "0003": "Oleksii Kononenko",
+    "0004": "Dominic Prichard",
+    "0005": "Marice Caunty",
+    "0006": "Cordero Clarke",
+    "0007": "Robert Washington",
+    "0008": "Roberto Rovero",
     // IMPORTANT: Add/Update your mechanics directly here as "PIN": "Full Name",
     // You will need to re-copy this file to tablets if you change this list.
 };
