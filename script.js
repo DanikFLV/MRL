@@ -1,4 +1,4 @@
-const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsmza242Bg2snQN4/exec'; // This URL is back!
+const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec'; // This URL is back!
 
 const MECHANICS = {
     "0000": "Salvador Flores",
