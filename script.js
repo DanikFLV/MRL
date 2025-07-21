@@ -2,7 +2,7 @@ const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHr
 
 const MECHANICS = {
     "3101": "Salvador Flores",
-    "6589": "Ivand Adorno",
+    "6589": "Ivan Adorno",
     "4569": "Dmitrii Kushnirenko",
     "0269": "Oleksii Kononenko",
     "0236": "Dominic Prichard",
