@@ -12,7 +12,7 @@ const MECHANICS = {
     "1258": "Roberto Rovero",
     "3695": "Eduardo Perez",
     "0125": "Lamont Blake",
-    "1937": "Michael Guize",
+    "1937": "Michael Guise",
     "5921": "Matt Farmer",
     "3495": "Christopher Taylor",
 
