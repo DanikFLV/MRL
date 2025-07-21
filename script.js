@@ -1,19 +1,15 @@
-const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec';
+const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsmza242Bg2snQN4/exec'; // This URL is back!
 
 const MECHANICS = {
-    "0000": "Salvador Flores",
-    "0001": "Ivand Adorno",
-    "0002": "Dmitrii Kushnirenko",
-    "0003": "Oleksii Kononenko",
-    "0004": "Dominic Prichard",
-    "0005": "Marice Caunty",
-    "0006": "Cordero Clarke",
-    "0007": "Robert Washington",
-    "0008": "Roberto Rovero",
+    "2030": "John Johnson",
+    "1500": "Maria Garcia",
+    "4040": "David Lee",
+    "7777": "Sophia Williams",
     // IMPORTANT: Add/Update your mechanics directly here as "PIN": "Full Name",
     // You will need to re-copy this file to tablets if you change this list.
 };
 
+// Using sessionStorage for "remember me" based on last preference
 const MECHANIC_SESSION_KEY = "mechanicLoggedIn";
 const MECHANIC_NAME_SESSION_KEY = "mechanicNameSession";
 
@@ -25,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageDiv = document.getElementById('message');
     const mechanicNameInput = document.getElementById('mechanicName');
     const mechanicNotesInput = document.getElementById('mechanicNotes');
-    const statusSelect = document.getElementById('status'); // NEW: Get reference to status dropdown
+    const statusSelect = document.getElementById('status');
 
     // PIN Elements
     const pinOverlay = document.getElementById('pin-overlay');
@@ -42,6 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmationOverlay = document.getElementById('confirmation-overlay');
     const confirmationMessage = document.getElementById('confirmation-message');
 
+    // NEW: Logout Button Element
+    const logoutButton = document.getElementById('logoutButton');
+
 
     // --- PIN LOGIC START ---
     function showPinScreen(message = '', headerText = 'Enter PIN') {
@@ -55,6 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.removeItem(MECHANIC_NAME_SESSION_KEY);
         mechanicNameInput.value = '';
         mechanicNameInput.readOnly = false;
+        if (logoutButton) { // Hide logout button when pin screen is visible
+            logoutButton.style.display = 'none';
+        }
     }
 
     function hidePinScreen(mechanicName) {
@@ -62,6 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mechanicName) {
             mechanicNameInput.value = mechanicName;
             mechanicNameInput.readOnly = true;
+        }
+        if (logoutButton) { // Show logout button when form is visible
+            logoutButton.style.display = 'block';
         }
     }
 
@@ -93,12 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const isMechanicLoggedIn = sessionStorage.getItem(MECHANIC_SESSION_KEY);
     const rememberedMechanicName = sessionStorage.getItem(MECHANIC_NAME_SESSION_KEY);
 
+    // Initial load logic: check session first
     if (isMechanicLoggedIn === "true" && rememberedMechanicName) {
-        hidePinScreen(rememberedMechanicName);
-        showGreeting(rememberedMechanicName);
+        hidePinScreen(rememberedMechanicName); // Hide PIN screen and show form
+        showGreeting(rememberedMechanicName); // Show welcome back greeting
     } else {
-        showPinScreen();
+        showPinScreen(); // Show PIN screen initially
     }
+
 
     pinSubmitButton.addEventListener('click', checkPin);
     pinInput.addEventListener('keypress', function(event) {
@@ -110,27 +117,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // 1. Populate Machine # dropdown (1 to 70) - UNCHANGED
-    for (let i = 1; i <= 74; i++) {
+    for (let i = 1; i <= 70; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Machine ${i}`;
         machineNumSelect.appendChild(option);
     }
 
-    // 2. Populate Issue dropdown (placeholder issues for now)
-            const issues = [
-                "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
-                "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
-                "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
-                "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
-                "Clearance (CLR)", "Connecting Rod Bearing (CRB)", "Index Timing (EIT)",
-                "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
-                "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
-                "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
-                "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
-                "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
-                "Bearing Failure", "Unexpected Stop"
-]
+    // 2. Populate Issue dropdown (placeholder issues for now) - UNCHANGED
+    const issues = [
+        "Mechanical Failure", "Electrical Issue", "Software Glitch",
+        "Hydraulic Leak", "Pneumatic Problem", "Overheating",
+        "Noise/Vibration", "Jam/Blockage", "Sensor Malfunction",
+        "Calibration Error", "Wear and Tear", "Alignment Issue",
+        "Power Supply Problem", "Motor Fault", "Bearing Failure",
+        "Filter Clogged", "Pressure Loss", "Belt Broken/Slipping",
+        "Lubrication Issue", "Corrosion", "Control System Error",
+        "Safety System Trip", "Communication Error", "Cooling System Failure",
+        "Exhaust System Issue",
+        "Fluid Level Low", "Contamination",
+        "Blade Dull/Damaged", "Noisy Operation", "Unexpected Stop"
+    ];
 
     issues.forEach((issue, index) => {
         const option = document.createElement('option');
@@ -172,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 
-    // Handle Form Submission - MODIFIED to include status
+    // Handle Form Submission - REVERTED TO GOOGLE APPS SCRIPT
     repairForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
@@ -185,35 +192,55 @@ document.addEventListener('DOMContentLoaded', function() {
             issue: document.getElementById('issue').value,
             description: document.getElementById('description').value,
             actionTaken: document.getElementById('actionTaken').value,
-            status: statusSelect.value, // NEW: Add status to formData
-            mechanicNotes: mechanicNotesInput.value,
+            status: statusSelect.value, // Keep new field
+            mechanicNotes: mechanicNotesInput.value, // Keep new field
             mechanicName: mechanicNameInput.value,
             timeStartedMachine: document.getElementById('timeStartedMachine').value
         };
 
         try {
+            // Reverted to fetching Google Apps Script doPost
             const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', // Still needed for Apps Script
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData)
             });
 
-            showConfirmationOverlay(); 
+            showMessage('Repair log submitted successfully!', 'success');
             
             repairForm.reset();
             document.getElementById('date').value = `${year}-${month}-${day}`;
             document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
 
+            showConfirmationOverlay(); 
+            
         } catch (error) {
-            console.error('Error submitting form:', error);
-            showMessage('Failed to submit repair log. Please try again.', 'error');
+            console.error('Error submitting form to Apps Script:', error);
+            showMessage('Failed to submit repair log. Please try again. (Check console for details)', 'error');
             setTimeout(() => {
                 showMessage('', '');
                 showPinScreen();
             }, 5000);
         }
     });
+
+    // NEW: Logout Button Event Listener
+    if (logoutButton) { // Ensure button exists before adding listener
+        logoutButton.addEventListener('click', function() {
+            // Clear the form fields upon logout
+            repairForm.reset();
+            document.getElementById('date').value = `${year}-${month}-${day}`; // Reset date
+            document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`; // Reset time
+
+            // Show the PIN screen, which also clears mechanic name input and sessionStorage
+            showPinScreen();
+            // Optionally show a "Logged out" message briefly
+            showMessage('Successfully logged out.', 'success');
+            setTimeout(() => messageDiv.style.display = 'none', 2000); // Hide after 2 seconds
+        });
+    }
+
 });
