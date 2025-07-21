@@ -1,10 +1,16 @@
 const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsmza242Bg2snQN4/exec'; // This URL is back!
 
 const MECHANICS = {
-    "2030": "John Johnson",
-    "1500": "Maria Garcia",
-    "4040": "David Lee",
-    "7777": "Sophia Williams",
+    "0000": "Salvador Flores",
+    "0001": "Ivand Adorno",
+    "0002": "Dmitrii Kushnirenko",
+    "0003": "Oleksii Kononenko",
+    "0004": "Dominic Prichard",
+    "0005": "Marice Caunty",
+    "0006": "Cordero Clarke",
+    "0007": "Robert Washington",
+    "0008": "Roberto Rovero",
+
     // IMPORTANT: Add/Update your mechanics directly here as "PIN": "Full Name",
     // You will need to re-copy this file to tablets if you change this list.
 };
@@ -117,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // 1. Populate Machine # dropdown (1 to 70) - UNCHANGED
-    for (let i = 1; i <= 70; i++) {
+    for (let i = 1; i <= 74; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Machine ${i}`;
@@ -125,18 +131,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 2. Populate Issue dropdown (placeholder issues for now) - UNCHANGED
-    const issues = [
-        "Mechanical Failure", "Electrical Issue", "Software Glitch",
-        "Hydraulic Leak", "Pneumatic Problem", "Overheating",
-        "Noise/Vibration", "Jam/Blockage", "Sensor Malfunction",
-        "Calibration Error", "Wear and Tear", "Alignment Issue",
-        "Power Supply Problem", "Motor Fault", "Bearing Failure",
-        "Filter Clogged", "Pressure Loss", "Belt Broken/Slipping",
-        "Lubrication Issue", "Corrosion", "Control System Error",
-        "Safety System Trip", "Communication Error", "Cooling System Failure",
-        "Exhaust System Issue",
-        "Fluid Level Low", "Contamination",
-        "Blade Dull/Damaged", "Noisy Operation", "Unexpected Stop"
+    // 2. Populate Issue dropdown (placeholder issues for now)
+            const issues = [
+                "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
+                "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
+                "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
+                "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
+                "Clearance (CLR)", "Connecting Rod Bearing (CRB)", "Index Timing (EIT)",
+                "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
+                "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
+                "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
+                "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
+                "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
+                "Bearing Failure", "Unexpected Stop"
+
     ];
 
     issues.forEach((issue, index) => {
