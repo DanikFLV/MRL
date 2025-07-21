@@ -14,6 +14,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 500px;
+    position: relative; /* Needed for absolute positioning of logout button if desired */
 }
 h1 {
     text-align: center;
@@ -79,7 +80,7 @@ textarea {
     border: 1px solid #f5c6cb;
 }
 
-/* NEW: PIN Overlay Styles (moved from index.html inline/style block) */
+/* PIN Overlay Styles */
 #pin-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -90,11 +91,11 @@ textarea {
     z-index: 1000;
     flex-direction: column;
 }
-#pin-overlay h2 { /* Targeting h2 within pin overlay */
+#pin-overlay h2 {
     margin-top: 0;
     color: #333;
 }
-#pin-overlay input[type="password"] { /* Targeting input within pin overlay */
+#pin-overlay input[type="password"] {
     width: calc(100% - 20px);
     padding: 12px;
     margin-bottom: 20px;
@@ -103,7 +104,7 @@ textarea {
     font-size: 20px;
     text-align: center;
 }
-#pin-overlay button { /* Targeting button within pin overlay */
+#pin-overlay button {
     width: 100%;
     padding: 12px;
     background-color: #007bff;
@@ -117,25 +118,25 @@ textarea {
 #pin-overlay button:hover {
     background-color: #0056b3;
 }
-#pin-overlay p { /* Targeting message p within pin overlay */
+#pin-overlay p {
     color: red;
     margin-top: 15px;
     display: none;
 }
 
 
-/* NEW: Greeting Overlay Styles (moved from index.html inline/style block) */
+/* Greeting Overlay Styles */
 #greeting-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
-    display: none; /* Hidden by default */
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 1001;
     flex-direction: column;
 }
-#greeting-overlay > div { /* Targeting the inner box of greeting overlay */
+#greeting-overlay > div {
     background-color: #4CAF50;
     color: white;
     padding: 40px;
@@ -149,19 +150,19 @@ textarea {
 }
 
 
-/* NEW: Confirmation Overlay Styles (moved from index.html inline/style block) */
+/* Confirmation Overlay Styles */
 #confirmation-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.8);
-    display: none; /* Hidden by default */
+    display: none;
     justify-content: center;
     align-items: center;
-    z-index: 1002; /* Higher than greeting overlay */
+    z-index: 1002;
     flex-direction: column;
     animation: fadeIn 0.5s;
 }
-#confirmation-overlay .confirmation-box { /* Targeting the inner box of confirmation overlay */
+#confirmation-overlay .confirmation-box {
     background-color: #ffffff;
     color: #333;
     padding: 50px 30px;
@@ -172,8 +173,8 @@ textarea {
     max-width: 450px;
     font-size: 1.8em;
     font-weight: bold;
-    transform: scale(0.8); /* Start smaller */
-    animation: popIn 0.5s forwards; /* Animation for popping in */
+    transform: scale(0.8);
+    animation: popIn 0.5s forwards;
 }
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -192,6 +193,25 @@ textarea {
     background: #4CAF50;
     color: white;
     line-height: 80px;
-    font-size: 4em; /* Larger checkmark */
+    font-size: 4em;
     text-align: center;
+}
+
+/* NEW: Logout Button Styles */
+.logout-button {
+    position: absolute; /* Position relative to .container */
+    top: 10px;
+    right: 10px;
+    padding: 8px 15px;
+    background-color: #f44336; /* Red color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 5; /* Ensure it's above other elements if positioned */
+}
+.logout-button:hover {
+    background-color: #da190b;
 }
