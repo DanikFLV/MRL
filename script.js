@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. Populate Issue dropdown (placeholder issues for now) - UNCHANGED
     const issues = [
+        "Other...",
         "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
         "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
         "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
