@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // 1. Populate Machine # dropdown (1 to 70) - UNCHANGED
-    for (let i = 1; i <= 70; i++) {
+    for (let i = 1; i <= 74; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Machine ${i}`;
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
                 "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
                 "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
-                "Clearance (CLR)", "Connectin Rod Bearing (CRB)", "Index Timing (EIT)",
+                "Clearance (CLR)", "Connecting Rod Bearing (CRB)", "Index Timing (EIT)",
                 "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
                 "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
                 "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
