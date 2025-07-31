@@ -96,6 +96,58 @@ body::before {
     position: relative;
 }
 
+/* Company Branding Styles */
+.company-branding {
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.company-name {
+    display: block;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    animation: professionalGlow 4s ease-in-out infinite alternate;
+}
+
+.company-subtitle {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.company-tagline {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--accent-orange);
+    letter-spacing: 1px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+@keyframes professionalGlow {
+    from {
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    }
+    to {
+        text-shadow: 0 0 25px rgba(0, 212, 255, 0.7), 0 0 35px rgba(0, 212, 255, 0.3);
+    }
+}
+
 .tech-border {
     position: absolute;
     top: 0;
@@ -329,6 +381,36 @@ textarea {
     box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);
 }
 
+.message.warning {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 193, 7, 0.1));
+    border: 2px solid var(--accent-orange);
+    color: var(--accent-orange);
+    text-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+    font-weight: 700;
+    animation: pulseWarning 2s infinite;
+}
+
+.message.info {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+    border: 2px solid var(--accent-blue);
+    color: var(--accent-blue);
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    font-weight: 600;
+}
+
+@keyframes pulseWarning {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+        transform: scale(1.02);
+    }
+}
+
 .logout-button {
     padding: 8px 12px;
     background: linear-gradient(135deg, #ff4757, #ff3742);
@@ -505,13 +587,16 @@ textarea {
 }
 
 .greeting-container {
-    background: linear-gradient(135deg, var(--accent-green), #00cc77);
+    background: linear-gradient(135deg, #030508, #070b12);
+    backdrop-filter: blur(20px);
     color: white;
+    border: 2px solid #003d5c;
     padding: 40px;
-    border-radius: 15px;
+    border-radius: 20px;
     box-shadow: 
-        0 0 40px rgba(0, 255, 136, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 0 10px rgba(0, 61, 92, 0.3),
+        0 0 30px rgba(0, 61, 92, 0.4),
+        0 0 60px rgba(0, 61, 92, 0.2);
     text-align: center;
     width: 90%;
     max-width: 450px;
@@ -521,10 +606,25 @@ textarea {
     font-family: 'Orbitron', monospace;
     text-transform: uppercase;
     letter-spacing: 3px;
-    text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Confirmation Overlay Styles - Updated */
+.greeting-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #003d5c, rgba(0, 61, 92, 0.8), #003d5c);
+    border-radius: 20px;
+    z-index: -1;
+    animation: borderGlow 3s linear infinite;
+}
+
+/* Confirmation Overlay Styles - Updated for Better Look */
 #confirmation-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -539,20 +639,96 @@ textarea {
 }
 
 #confirmation-overlay .confirmation-box {
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--neon-glow);
+    background: linear-gradient(135deg, #030508, #070b12);
+    backdrop-filter: blur(20px);
+    color: white;
+    border: 2px solid #003d5c;
+    box-shadow: 
+        0 0 10px rgba(0, 61, 92, 0.3),
+        0 0 30px rgba(0, 61, 92, 0.4),
+        0 0 60px rgba(0, 61, 92, 0.2);
+    border-radius: 20px;
+    padding: 40px 50px;
+    text-align: center;
     font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
     transform: scale(0.8);
     animation: popIn 0.5s forwards;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    overflow: hidden;
 }
 
-#confirmation-overlay .checkmark {
-    background: linear-gradient(135deg, var(--accent-green), #00cc77);
-    color: white;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+#confirmation-overlay .confirmation-box::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #003d5c, rgba(0, 61, 92, 0.8), #003d5c);
+    border-radius: 20px;
+    z-index: -1;
+    animation: borderGlow 3s linear infinite;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Developer Credit */
+.developer-credit {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+}
+
+.developer-credit:hover {
+    opacity: 1;
+}
+
+.dev-text {
+    color: var(--text-secondary);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+.dev-name {
+    color: var(--accent-blue);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+    margin-left: 5px;
 }

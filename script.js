@@ -1,28 +1,12 @@
-const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyRtHrvRaWqI5HwE33LuiHkdmsouPXEXCsvdoq0Jw_Lpr12GF3sfmza242Bg2snQN4/exec'; // This URL is back!
-
-const MECHANICS = {
-    "3101": "Salvador Flores",
-    "6589": "Ivan Adorno",
-    "4569": "Dmitrii Kushnirenko",
-    "0269": "Oleksii Kononenko",
-    "0236": "Dominic Prichard",
-    "9870": "Maurice Canty",
-    "3698": "Cordero Clarke",
-    "2569": "Robert Washington",
-    "1258": "Roberto Rovero",
-    "3695": "Eduardo Perez",
-    "0125": "Lamont Blake",
-    "1937": "Michael Guise",
-    "5921": "Matt Farmer",
-    "3495": "Christopher Taylor",
-
-    // IMPORTANT: Add/Update your mechanics directly here as "PIN": "Full Name",
-    // You will need to re-copy this file to tablets if you change this list.
-};
-
-// Using sessionStorage for "remember me" based on last preference
+// REMOVED: GOOGLE_SHEET_WEB_APP_URL - We're no longer directly using Apps Script for submission
+// REMOVED: MECHANICS - This is now hardcoded in the HTML as per your previous preference
 const MECHANIC_SESSION_KEY = "mechanicLoggedIn";
 const MECHANIC_NAME_SESSION_KEY = "mechanicNameSession";
+
+
+
+
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -33,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mechanicNameInput = document.getElementById('mechanicName');
     const mechanicNotesInput = document.getElementById('mechanicNotes');
     const statusSelect = document.getElementById('status');
+    const logoutButton = document.getElementById('logoutButton');
 
     // PIN Elements
     const pinOverlay = document.getElementById('pin-overlay');
@@ -49,11 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmationOverlay = document.getElementById('confirmation-overlay');
     const confirmationMessage = document.getElementById('confirmation-message');
 
-    // MOVED: Logout Button Element declaration INSIDE DOMContentLoaded
-    const logoutButton = document.getElementById('logoutButton'); 
 
-
-    // --- PIN LOGIC START ---
+    // --- PIN LOGIC START --- (No changes here, it uses the global MECHANICS object)
     function showPinScreen(message = '', headerText = 'Enter PIN') {
         pinMessage.textContent = message;
         pinMessage.style.display = message ? 'block' : 'none';
@@ -65,9 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.removeItem(MECHANIC_NAME_SESSION_KEY);
         mechanicNameInput.value = '';
         mechanicNameInput.readOnly = false;
-        if (logoutButton) { // Hide logout button when pin screen is visible
-            logoutButton.style.display = 'none';
-        }
     }
 
     function hidePinScreen(mechanicName) {
@@ -76,48 +55,57 @@ document.addEventListener('DOMContentLoaded', function() {
             mechanicNameInput.value = mechanicName;
             mechanicNameInput.readOnly = true;
         }
-        if (logoutButton) { // Show logout button when form is visible
-            logoutButton.style.display = 'block';
-        }
     }
 
     function showGreeting(name) {
-        greetingText.textContent = `Hello ${name}!`;
+        greetingText.textContent = `Welcome ${name}!`;
         greetingOverlay.style.display = 'flex';
         setTimeout(() => {
             greetingOverlay.style.display = 'none';
-        }, 2000);
+            // Show warning message after greeting
+            showMessage('REMINDER: Don\'t forget to log out when you finish your shift!', 'warning');
+        }, 1500);
     }
 
-    function checkPin() {
-        const enteredPin = pinInput.value;
-        const mechanicName = MECHANICS[enteredPin];
-
-        if (mechanicName) {
-            sessionStorage.setItem(MECHANIC_SESSION_KEY, "true");
-            sessionStorage.setItem(MECHANIC_NAME_SESSION_KEY, mechanicName);
-            hidePinScreen(mechanicName);
-            showGreeting(mechanicName);
-
-        } else {
-            sessionStorage.removeItem(MECHANIC_SESSION_KEY);
-            sessionStorage.removeItem(MECHANIC_NAME_SESSION_KEY);
-            showPinScreen('Incorrect PIN. Please try again.');
-        }
-    }
+    
     
     const isMechanicLoggedIn = sessionStorage.getItem(MECHANIC_SESSION_KEY);
     const rememberedMechanicName = sessionStorage.getItem(MECHANIC_NAME_SESSION_KEY);
 
-    // Initial load logic: check session first
     if (isMechanicLoggedIn === "true" && rememberedMechanicName) {
-        hidePinScreen(rememberedMechanicName); // Hide PIN screen and show form
-        showGreeting(rememberedMechanicName); // Show welcome back greeting
+        hidePinScreen(rememberedMechanicName);
+        showGreeting(rememberedMechanicName);
     } else {
-        showPinScreen(); // Show PIN screen initially
+        showPinScreen();
     }
-
-
+    async function checkPin() {
+        const enteredPin = pinInput.value.trim();
+    
+    if(!enteredPin) {
+        showPinScreen('Please enter a PIN.');
+        return;
+    }
+    
+    try {
+        const docRef = window.doc(window.db, "pins", enteredPin);
+        const docSnap = await window.getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const mechanicName = data.name;
+            
+            sessionStorage.setItem(MECHANIC_SESSION_KEY, "true");
+            sessionStorage.setItem(MECHANIC_NAME_SESSION_KEY, mechanicName);
+            hidePinScreen(mechanicName);
+            showGreeting(mechanicName);
+        } else {
+            showPinScreen('Invalid Pin. Try Again.');
+        }
+    } catch (error) {
+        console.error("Error checking PIN:", error);
+        showPinScreen('Something went wrong. Try again.');
+    }
+}
     pinSubmitButton.addEventListener('click', checkPin);
     pinInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
@@ -128,27 +116,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // 1. Populate Machine # dropdown (1 to 70) - UNCHANGED
-    for (let i = 1; i <= 74; i++) { // Assuming 74 machines now
+    for (let i = 1; i <= 74; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = `Machine ${i}`;
         machineNumSelect.appendChild(option);
     }
 
-    // 2. Populate Issue dropdown (placeholder issues for now) - UNCHANGED
-    const issues = [
-        "Other...",
-        "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
-        "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
-        "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
-        "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
-        "Clearance (CLR)", "Connecting Rod Bearing (CRB)", "Index Timing (EIT)",
-        "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
-        "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
-        "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
-        "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
-        "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
-        "Bearing Failure", "Unexpected Stop"
+    // 2. Populate Issue dropdown (placeholder issues for now)
+            const issues = [
+                "Other...", "New Work Order (NWO)", "New Raw Material (NRM)", "New Work Order New Material (NWNM)",
+                "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
+                "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
+                "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
+                "Replace Backup Roll (BUR)", "Cam Issue (CAM)", "Cam Folower (CFL)",
+                "Clearance (CLR)", "Connectin Rod Bearing (CRB)", "Index Timing (EIT)",
+                "Electrical Issue (ELE)", "Feed Roll Bearing (FEB)", "Belt Broken/Slipping",
+                "Lubrication Issue", "Feed Roll Tension (FRT)", "Head (HED)",
+                "Motor Issue Expander (MTE)", "Motor Issue Flattener (MTF)", "Motor Issue Rewinder (MTR)",
+                "New Setup Dies (NSU)", "Replace Bevel and Pinion Gears (PNB)", "Pin/Sleeves/Ball Cages (PSB)",
+                "Index Spring Tension (SPG)", "Stripper Plate (STP)", "Feed Timing (TIM)", 
+                "Bearing Failure", "Unexpected Stop"
+
     ];
 
     issues.forEach((issue, index) => {
@@ -163,13 +152,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    document.getElementById('date').value = `${year}-${month}-${day}`;
+    const dateInput = document.getElementById('date');
+    dateInput.value = `${year}-${month}-${day}`;
+    dateInput.readOnly = true; // Prevent user from changing the date
 
     // Set current time as default for time field
     const hours = String(today.getHours()).padStart(2, '0');
     const minutes = String(today.getMinutes()).padStart(2, '0');
-    document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
+    // return back if need change time - document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
 
+    // this need to coment or delete for changin time
+    const timeInput = document.getElementById('timeStartedMachine');
+    timeInput.value = `${hours}:${minutes}`;
+    timeInput.readOnly = true; // Prevent user from changing the time
 
     // Function to display messages - UNCHANGED
     function showMessage(text, type) {
@@ -181,45 +176,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    // Function to show confirmation overlay - UNCHANGED
-    function showConfirmationOverlay(message = "Thank you for your submission!") {
+    // Function to show confirmation overlay - MODIFIED TO NOT AUTO-LOGOUT
+    function showConfirmationOverlay(message = "REPAIR LOG SUBMITTED SUCCESSFULLY!") {
         confirmationMessage.textContent = message;
         confirmationOverlay.style.display = 'flex';
         setTimeout(() => {
             confirmationOverlay.style.display = 'none';
-            showPinScreen();
-        }, 3000);
+            // Show reminder message instead of logging out
+            showMessage('You are still logged in. Don\'t forget to log out after you finish your shift!', 'info');
+        }, 2500);
     }
+    
 
-    // Handle Form Submission - REVERTED TO GOOGLE APPS SCRIPT
+    // Handle Form Submission - MODIFIED TO USE FIRESTORE
     repairForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         showMessage('Submitting data...', 'info');
 
         const formData = {
-            shift: document.getElementById('shift').value,
+            //shift: document.getElementById('shift').value,
             date: document.getElementById('date').value,
             machineNum: document.getElementById('machineNum').value,
             issue: document.getElementById('issue').value,
             description: document.getElementById('description').value,
             actionTaken: document.getElementById('actionTaken').value,
-            status: statusSelect.value, // Keep new field
-            mechanicNotes: mechanicNotesInput.value, // Keep new field
+            status: statusSelect.value,
+            mechanicNotes: mechanicNotesInput.value,
             mechanicName: mechanicNameInput.value,
-            timeStartedMachine: document.getElementById('timeStartedMachine').value
+            timeStartedMachine: document.getElementById('timeStartedMachine').value,
+            timestamp: new Date().toISOString() // NEW: Add a server-side timestamp (for sorting/ordering)
         };
 
         try {
-            // Reverted to fetching Google Apps Script doPost
-            const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Still needed for Apps Script
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
+            // Check if Firebase db is available from window object (initialized in index.html)
+            if (!window.db || !window.collection || !window.addDoc) {
+                throw new Error("Firebase SDK not initialized correctly or db not exposed.");
+            }
+
+            // ADD DATA TO FIRESTORE
+            await window.addDoc(window.collection(window.db, "repair_logs"), formData); // "repair_logs" is your collection name
 
             showMessage('Repair log submitted successfully!', 'success');
             
@@ -230,16 +226,16 @@ document.addEventListener('DOMContentLoaded', function() {
             showConfirmationOverlay(); 
             
         } catch (error) {
-            console.error('Error submitting form to Apps Script:', error);
+            console.error('Error submitting form to Firestore:', error);
             showMessage('Failed to submit repair log. Please try again. (Check console for details)', 'error');
+            // Remove auto-logout on error, just show error message
             setTimeout(() => {
                 showMessage('', '');
-                showPinScreen();
             }, 5000);
         }
     });
 
-    // NEW: Logout Button Event Listener - Moved inside DOMContentLoaded
+     // NEW: Logout Button Event Listener - Moved inside DOMContentLoaded
     if (logoutButton) { // Ensure button exists before adding listener
         logoutButton.addEventListener('click', function() {
             // Clear the form fields upon logout
@@ -255,4 +251,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Dark Mode Toggle
+    const darkToggleBtn = document.getElementById('darkModeToggle');
+    if (darkToggleBtn) {
+        darkToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const icon = darkToggleBtn.querySelector('i');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.className = 'fas fa-sun';
+                darkToggleBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            } else {
+                icon.className = 'fas fa-moon';
+                darkToggleBtn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            }
+        });
+    }
 });

@@ -4,55 +4,239 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Machine Repair Admin Dashboard</title>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="admin-style.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="admin-password-overlay">
         <div class="password-box">
-            <h2>Admin Login</h2>
-            <input type="password" id="admin-password-input" placeholder="Enter Admin Password" autocomplete="off">
-            <button id="admin-password-submit">Login</button>
+            <div class="admin-header">
+                <span class="admin-icon">🔐</span>
+                <h2>ADMIN ACCESS</h2>
+            </div>
+            <input type="password" id="admin-password-input" placeholder="Enter Security Code" autocomplete="off">
+            <button id="admin-password-submit">
+                <span class="button-text">AUTHENTICATE</span>
+                <span class="button-arrow">▶</span>
+            </button>
             <p id="admin-password-message"></p>
         </div>
     </div>
 
     <div id="loading-overlay">
-        <div class="spinner"></div>
-        <p>Loading data...</p>
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>ACCESSING DATABASE...</p>
+        </div>
     </div>
 
     <div class="container" style="display: none;">
-        <h1>Machine Repair Log - Admin View</h1>
-        <div class="controls">
-            <button class="button" id="refreshData">Refresh Data</button>
-            <button class="button" id="downloadCsv">Download CSV</button>
-            
-            <div class="month-selector">
-                <label for="logTabs">Select Month:</label>
-                <select id="logTabs" class="button">
-                    <option value="">Loading...</option>
-                </select>
+        <div class="admin-header-section">
+            <div class="tech-border"></div>
+            <!-- Company Branding - Hidden for now, will reveal during presentation
+            <div class="company-branding">
+                <span class="company-name">PMRT-ITT</span>
+                <span class="company-subtitle">Professional Machine Resource Management & IT Technologies</span>
+                <span class="company-tagline">Excellence in Industrial Systems Management</span>
+            </div>
+            -->
+            <h1><span class="tech-accent">◆</span> ADMIN DASHBOARD <span class="tech-accent">◆</span></h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-dot active"></span>
+                    <span>ADMIN MODE ACTIVE</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot"></span>
+                    <span id="current-time"></span>
+                </div>
+                <div class="status-item">
+                    <button class="logout-button" onclick="sessionStorage.removeItem('adminLoggedIn'); location.reload();">
+                        <span class="logout-icon">⏻</span>
+                        LOGOUT
+                    </button>
+                </div>
             </div>
         </div>
-        
-        <p id="loading-message">Loading data...</p>
 
-        <div class="table-responsive">
-            <table id="repair-data-table" class="display">
-                <thead>
-                    </thead>
-                <tbody>
-                    </tbody>
-            </table>
+        <div class="controls-section">
+            <div class="control-panel">
+                <button class="control-button primary" id="refreshData" title="Refresh Logs">
+                    <span class="button-icon">🔄</span>
+                    <span>REFRESH DATA</span>
+                </button>
+                <button class="control-button secondary" id="downloadCsv" title="Download as Excel">
+                    <span class="button-icon">⬇️</span>
+                    <span>EXPORT EXCEL</span>
+                </button>
+                <button class="control-button quaternary" id="exportHtml" title="Export HTML Report">
+                    <span class="button-icon">📄</span>
+                    <span>EXPORT HTML</span>
+                </button>
+            </div>
+        </div>
+        <div class="filter-section">
+            <div class="filter-header">
+                <h3><span class="filter-icon">🔍</span> DATA FILTERS</h3>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="search-machine"><span class="field-icon">🔧</span>MACHINE #:</label>
+                    <input type="text" id="search-machine" placeholder="Enter machine number">
+                </div>
+
+                <div class="filter-group">
+                    <label for="search-day"><span class="field-icon">📅</span>DATE:</label>
+                    <input type="date" id="search-day">
+                </div>
+
+                <div class="filter-group">
+                    <label for="search-mechanic"><span class="field-icon">👤</span>MECHANIC:</label>
+                    <input type="text" id="search-mechanic" placeholder="Mechanic name">
+                </div>
+
+                <div class="filter-group">
+                    <label for="search-issue"><span class="field-icon">⚠️</span>ISSUE:</label>
+                    <input type="text" id="search-issue" placeholder="Issue keyword">
+                </div>
+
+                <div class="filter-group">
+                    <label for="search-shift"><span class="field-icon">🕒</span>SHIFT:</label>
+                    <select id="search-shift">
+                        <option value="">All Shifts</option>
+                        <option value="Green Day">Green Day</option>
+                        <option value="Green Night">Green Night</option>
+                        <option value="Blue Day">Blue Day</option>
+                        <option value="Blue Night">Blue Night</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="data-section">
+            <p id="loading-message" class="status-message"></p>
+            <div class="table-container">
+                <table id="repair-data-table" class="futuristic-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="analytics-section">
+            <div class="analytics-header">
+                <h3><span class="analytics-icon">📊</span> SYSTEM ANALYTICS</h3>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-container" data-chart="mechanicChart">
+                    <div class="chart-overlay">
+                        <span class="expand-icon">🔍</span>
+                        <span class="expand-text">CLICK TO EXPAND</span>
+                    </div>
+                    <canvas id="mechanicChart"></canvas>
+                </div>
+                <div class="chart-container" data-chart="issueChart">
+                    <div class="chart-overlay">
+                        <span class="expand-icon">🔍</span>
+                        <span class="expand-text">CLICK TO EXPAND</span>
+                    </div>
+                    <canvas id="issueChart"></canvas>
+                </div>
+                <div class="chart-container" data-chart="dailyChart">
+                    <div class="chart-overlay">
+                        <span class="expand-icon">🔍</span>
+                        <span class="expand-text">CLICK TO EXPAND</span>
+                    </div>
+                    <canvas id="dailyChart"></canvas>
+                </div>
+                <div class="chart-container" data-chart="machineLogsChart">
+                    <div class="chart-overlay">
+                        <span class="expand-icon">🔍</span>
+                        <span class="expand-text">CLICK TO EXPAND</span>
+                    </div>
+                    <canvas id="machineLogsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Modal -->
+    <div id="chart-modal" class="chart-modal">
+        <div class="chart-modal-content">
+            <div class="chart-modal-header">
+                <h3 id="modal-chart-title">CHART ANALYSIS</h3>
+                <button class="close-modal" id="close-chart-modal">
+                    <span class="close-icon">✕</span>
+                </button>
+            </div>
+            <div class="chart-modal-body">
+                <canvas id="modal-chart-canvas"></canvas>
+            </div>
         </div>
     </div>
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, query, orderBy, where, startAt, endAt } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdc9STb-EImui0DGhuteY8okGKWAMnpJE",
+    authDomain: "machinerepairlogsapp.firebaseapp.com",
+    projectId: "machinerepairlogsapp",
+    storageBucket: "machinerepairlogsapp.firebasestorage.app",
+    messagingSenderId: "933593286710",
+    appId: "1:933593286710:web:b257aa07e4a2a7d0cc7097",
+    measurementId: "G-BXNYDQ56KC"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Make db and Firestore functions globally accessible (for admin-script.js)
+  window.db = db;
+  window.collection = collection;
+  window.doc = doc;         // <-- ADD THIS
+  window.getDoc = getDoc;   // <-- ADD THIS
+  window.getDocs = getDocs;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.where = where;
+  window.startAt = startAt;
+  window.endAt = endAt;
+
+  // Update current time display
+  function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+      timeElement.textContent = timeString;
+    }
+  }
+  
+  // Update immediately and then every second
+  updateTime();
+  setInterval(updateTime, 1000);
+</script>
+
     <script src="admin-script.js"></script>
+
+    <!-- Developer Credit -->
+    <div class="developer-credit">
+        <span class="dev-text">Developed by</span>
+        <span class="dev-name">DANIIL RITENKO</span>
+    </div>
 
 </body>
 </html>

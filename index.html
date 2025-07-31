@@ -38,6 +38,13 @@
         
         <div class="header-section">
             <div class="tech-border"></div>
+            <!-- Company Branding - Hidden for now, will reveal during presentation
+            <div class="company-branding">
+                <span class="company-name">PMRT-ITT</span>
+                <span class="company-subtitle">Professional Machine Resource Management & IT Technologies</span>
+                <span class="company-tagline">Excellence in Industrial Systems Management</span>
+            </div>
+            -->
             <h1><span class="tech-accent">◆</span> MACHINE REPAIR LOG <span class="tech-accent">◆</span></h1>
             <div class="status-bar">
                 <div class="status-item">
@@ -164,122 +171,11 @@ const db = getFirestore(app);
 </script>
     <script src="script.js"></script>
 
-</body>
-</html>
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            width: 80%;
-            max-width: 350px;
-        ">
-            <h2 id="pin-header-text">Enter PIN</h2>
-            <input type="password" id="pin-input" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
-            <button id="pin-submit">Access App</button>
-            <p id="pin-message"></p>
-        </div>
+    <!-- Developer Credit -->
+    <div class="developer-credit">
+        <span class="dev-text">Developed by</span>
+        <span class="dev-name">DANIIL RITENKO</span>
     </div>
-
-    <div id="greeting-overlay">
-        <div style="
-            background-color: #4CAF50;
-            color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-            text-align: center;
-            width: 80%;
-            max-width: 400px;
-            font-size: 2.5em;
-            font-weight: bold;
-        ">
-            <span id="greeting-text">Hello Mechanic!</span>
-        </div>
-    </div>
-
-    <div id="confirmation-overlay">
-        <div class="confirmation-box">
-            <span class="checkmark">&#10003;</span>
-            <p id="confirmation-message">Thank you for your submission!</p>
-        </div>
-    </div>
-
-    <div class="container">
-        <button id="logoutButton" class="logout-button">Logout</button>
-        <h1>Machine Repair Log</h1>
-        <form id="repairForm">
-            <div class="form-group">
-                <label for="date">Date:</label>
-                <input type="date" id="date" name="date" required>
-            </div>
-
-            <div class="form-group">
-                <label for="mechanicName">Mechanic Name:</label>
-                <input type="text" id="mechanicName" name="mechanicName" placeholder="Your Name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="timeStartedMachine">Time Started Machine:</label>
-                <input type="time" id="timeStartedMachine" name="timeStartedMachine" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="shift">Shift:</label>
-                <select id="shift" name="shift" required>
-                    <option value="">Select Shift</option>
-                    <option value="Green Day">Green Day</option>
-                    <option value="Green Night">Green Night</option>
-                    <option value="Blue Day">Blue Day</option>
-                    <option value="Blue Night">Blue Night</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="machineNum">Machine #:</label>
-                <select id="machineNum" name="machineNum" required>
-                    <option value="">Select Machine</option>
-                    </select>
-            </div>
-
-            <div class="form-group">
-                <label for="issue">Issue:</label>
-                <select id="issue" name="issue" required>
-                    <option value="">Select Issue</option>
-                    </select>
-            </div>
-
-            <div class="form-group" id="descriptionGroup">
-                <label for="description">Description (related to issue):</label>
-                <textarea id="description" name="description" rows="3" placeholder="Describe the issue in detail..." required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="actionTaken">Action Taken:</label>
-                <textarea id="actionTaken" name="actionTaken" rows="4" placeholder="Describe the actions taken to fix the machine..." required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <select id="status" name="status" required>
-                    <option value="">Select Status</option>
-                    <option value="Fixed">Fixed</option>
-                    <option value="Need Further Repair">Need Further Repair</option>
-                    <option value="Shop">Shop</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="mechanicNotes">Mechanic Notes (Optional):</label>
-                <textarea id="mechanicNotes" name="mechanicNotes" rows="3" placeholder="Enter any notes or parts needed here..."></textarea>
-            </div>
-
-            <button type="submit" class="submit-button">Submit Repair</button>
-            <div id="message" class="message"></div>
-        </form>
-    </div>
-
-    <script src="script.js"></script>
 
 </body>
 </html>
