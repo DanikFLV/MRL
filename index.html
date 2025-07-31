@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Machine Repair Log</title>
     
     <link rel="stylesheet" href="styles.css">
@@ -10,7 +12,160 @@
 </head>
 <body>
     <div id="pin-overlay">
-        <div style="
+        <div class="pin-container">
+            <h2 id="pin-header-text">Enter PIN</h2>
+            <input type="password" id="pin-input" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+            <button id="pin-submit">Access App</button>
+            <p id="pin-message"></p>
+        </div>
+    </div>
+
+    <div id="greeting-overlay">
+        <div class="greeting-container">
+            <span id="greeting-text">Hello Mechanic!</span>
+        </div>
+    </div>
+
+    <div id="confirmation-overlay">
+        <div class="confirmation-box">
+            <span class="checkmark">&#10003;</span>
+            <p id="confirmation-message">Thank you for your submission!</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tech-grid-bg"></div>
+        
+        <div class="header-section">
+            <div class="tech-border"></div>
+            <h1><span class="tech-accent">◆</span> MACHINE REPAIR LOG <span class="tech-accent">◆</span></h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-dot active"></span>
+                    <span>SYSTEM ONLINE</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot"></span>
+                    <span id="current-time"></span>
+                </div>
+                <div class="status-item">
+                    <button id="logoutButton" class="logout-button">
+                        <span class="logout-icon">⏻</span>
+                        LOGOUT
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form id="repairForm" class="tech-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date"><span class="field-icon">📅</span>DATE:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="timeStartedMachine"><span class="field-icon">⏰</span>LOG TIME:</label>
+                    <input type="time" id="timeStartedMachine" name="timeStartedMachine" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mechanicName"><span class="field-icon">👤</span>MECHANIC NAME:</label>
+                <input type="text" id="mechanicName" name="mechanicName" placeholder="Enter Technician ID" required>
+            </div>
+            
+           
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="machineNum"><span class="field-icon">🔧</span>MACHINE #:</label>
+                    <select id="machineNum" name="machineNum" required>
+                        <option value="">Select Machine</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status"><span class="field-icon">📊</span>STATUS:</label>
+                    <select id="status" name="status" required>
+                        <option value="">Select Status</option>
+                        <option value="Fixed">Fixed</option>
+                        <option value="Need Further Repair">Need Further Repair</option>
+                        <option value="Shop">Shop</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="issue"><span class="field-icon">⚠️</span>ISSUE TYPE:</label>
+                <select id="issue" name="issue" required>
+                    <option value="">Select Issue</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="descriptionGroup">
+                <label for="description"><span class="field-icon">📝</span>ISSUE DESCRIPTION:</label>
+                <textarea id="description" name="description" rows="3" placeholder="Describe the technical issue in detail..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="actionTaken"><span class="field-icon">🔨</span>ACTION TAKEN:</label>
+                <textarea id="actionTaken" name="actionTaken" rows="4" placeholder="Detail the repair procedures and solutions implemented..." ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="mechanicNotes"><span class="field-icon">📋</span>TECHNICAL NOTES:</label>
+                <textarea id="mechanicNotes" name="mechanicNotes" rows="3" placeholder="Additional notes, parts needed, or recommendations..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-button">
+                <span class="button-text">SUBMIT REPAIR LOG</span>
+                <span class="button-arrow">▶</span>
+            </button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAdc9STb-EImui0DGhuteY8okGKWAMnpJE",
+  authDomain: "machinerepairlogsapp.firebaseapp.com",
+  projectId: "machinerepairlogsapp",
+  storageBucket: "machinerepairlogsapp.firebasestorage.app",
+  messagingSenderId: "933593286710",
+  appId: "1:933593286710:web:b257aa07e4a2a7d0cc7097",
+  measurementId: "G-BXNYDQ56KC"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Make Firestore functions accessible in other scripts
+  window.db = db;
+  window.doc = doc;
+  window.getDoc = getDoc;
+  window.collection = collection;
+  window.addDoc = addDoc;
+
+  // Update current time display
+  function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    document.getElementById('current-time').textContent = timeString;
+  }
+  
+  // Update immediately and then every second
+  updateTime();
+  setInterval(updateTime, 1000);
+</script>
+    <script src="script.js"></script>
+
+</body>
+</html>
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
