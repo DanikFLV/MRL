@@ -2,6 +2,12 @@
 // REMOVED: MECHANICS - This is now hardcoded in the HTML as per your previous preference
 const MECHANIC_SESSION_KEY = "mechanicLoggedIn";
 const MECHANIC_NAME_SESSION_KEY = "mechanicNameSession";
+const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
+const REMINDER_INTERVAL = 10 * 60 * 1000; // Show reminder every 10 minutes
+
+let inactivityTimer = null;
+let reminderTimer = null;
+let timeUpdateInterval = null;
 
 
 
@@ -14,9 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const issueSelect = document.getElementById('issue');
     const repairForm = document.getElementById('repairForm');
     const messageDiv = document.getElementById('message');
-    const mechanicNameInput = document.getElementById('mechanicName');
-    const mechanicNotesInput = document.getElementById('mechanicNotes');
-    const statusSelect = document.getElementById('status');
     const logoutButton = document.getElementById('logoutButton');
 
     // PIN Elements
@@ -34,6 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmationOverlay = document.getElementById('confirmation-overlay');
     const confirmationMessage = document.getElementById('confirmation-message');
 
+    // New info display elements
+    const currentDateElement = document.getElementById('current-date');
+    const currentTimeElement = document.getElementById('current-time');
+    const currentMechanicElement = document.getElementById('current-mechanic');
+    const sessionReminder = document.getElementById('session-reminder');
+
 
     // --- PIN LOGIC START --- (No changes here, it uses the global MECHANICS object)
     function showPinScreen(message = '', headerText = 'Enter PIN') {
@@ -43,17 +52,34 @@ document.addEventListener('DOMContentLoaded', function() {
         pinOverlay.style.display = 'flex';
         pinInput.value = '';
         pinInput.focus();
+        
+        // Clear session data
         sessionStorage.removeItem(MECHANIC_SESSION_KEY);
         sessionStorage.removeItem(MECHANIC_NAME_SESSION_KEY);
-        mechanicNameInput.value = '';
-        mechanicNameInput.readOnly = false;
+        
+        // Clear all timers and stop time updates
+        clearAllTimers();
+        stopTimeUpdates();
+        
+        // Clear mechanic display
+        if (currentMechanicElement) currentMechanicElement.textContent = '';
+        
+        // Hide session reminder
+        if (sessionReminder) sessionReminder.style.display = 'none';
     }
 
     function hidePinScreen(mechanicName) {
         pinOverlay.style.display = 'none';
         if (mechanicName) {
-            mechanicNameInput.value = mechanicName;
-            mechanicNameInput.readOnly = true;
+            // Update mechanic display
+            if (currentMechanicElement) currentMechanicElement.textContent = mechanicName;
+            
+            // Start time updates and session management
+            startTimeUpdates();
+            setupActivityListeners();
+            resetInactivityTimer();
+            
+            console.log('Session started for:', mechanicName);
         }
     }
 
@@ -62,12 +88,125 @@ document.addEventListener('DOMContentLoaded', function() {
         greetingOverlay.style.display = 'flex';
         setTimeout(() => {
             greetingOverlay.style.display = 'none';
-            // Show warning message after greeting
-            showMessage('REMINDER: Don\'t forget to log out when you finish your shift!', 'warning');
         }, 1500);
     }
 
-    
+    // Function to update date and time display
+    function updateDateTime() {
+        const now = new Date();
+        
+        // Format date as MM/DD/YYYY (matching your example: 08/03/2025)
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const year = now.getFullYear();
+        const dateStr = `${month}/${day}/${year}`;
+        
+        // Format time as HH:MM:SS (matching your example: 08:33:26)
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes}:${seconds}`;
+        
+        if (currentDateElement) currentDateElement.textContent = dateStr;
+        if (currentTimeElement) currentTimeElement.textContent = timeStr;
+    }
+
+    // Function to start time updates
+    function startTimeUpdates() {
+        updateDateTime(); // Update immediately
+        timeUpdateInterval = setInterval(updateDateTime, 1000); // Update every second
+    }
+
+    // Function to stop time updates
+    function stopTimeUpdates() {
+        if (timeUpdateInterval) {
+            clearInterval(timeUpdateInterval);
+            timeUpdateInterval = null;
+        }
+    }
+
+    // Function to show session reminder
+    function showSessionReminder() {
+        if (sessionReminder) {
+            sessionReminder.style.display = 'block';
+            setTimeout(() => {
+                if (sessionReminder) {
+                    sessionReminder.style.display = 'none';
+                }
+            }, 5000); // Hide after 5 seconds
+        }
+    }
+
+    // Function to reset inactivity timer
+    function resetInactivityTimer() {
+        // Clear existing timers
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        if (reminderTimer) clearTimeout(reminderTimer);
+
+        // Set new inactivity timer (1 hour)
+        inactivityTimer = setTimeout(() => {
+            console.log('Session timeout - logging out');
+            logout();
+        }, SESSION_TIMEOUT);
+
+        // Set reminder timer (show reminder every 10 minutes)
+        reminderTimer = setTimeout(function showReminderAndSetNext() {
+            showSessionReminder();
+            reminderTimer = setTimeout(showReminderAndSetNext, REMINDER_INTERVAL);
+        }, REMINDER_INTERVAL);
+        
+        console.log('Inactivity timer reset - session extended');
+    }
+
+    // Function to clear all timers
+    function clearAllTimers() {
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+        }
+        if (reminderTimer) {
+            clearTimeout(reminderTimer);
+            reminderTimer = null;
+        }
+    }
+
+    // Function to handle logout
+    function logout() {
+        clearAllTimers();
+        stopTimeUpdates();
+        
+        // Clear the form fields upon logout
+        repairForm.reset();
+        
+        // Clear mechanic display
+        if (currentMechanicElement) currentMechanicElement.textContent = '';
+        
+        // Hide session reminder
+        if (sessionReminder) sessionReminder.style.display = 'none';
+
+        // Show the PIN screen, which also clears sessionStorage
+        showPinScreen();
+        
+        // Optionally show a "Logged out" message briefly
+        showMessage('Successfully logged out.', 'success');
+        setTimeout(() => messageDiv.style.display = 'none', 2000);
+    }
+
+    // Function to setup activity listeners
+    function setupActivityListeners() {
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        
+        // Remove any existing listeners first
+        events.forEach(event => {
+            document.removeEventListener(event, resetInactivityTimer, true);
+        });
+        
+        // Add new listeners
+        events.forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+    }
+
     
     const isMechanicLoggedIn = sessionStorage.getItem(MECHANIC_SESSION_KEY);
     const rememberedMechanicName = sessionStorage.getItem(MECHANIC_NAME_SESSION_KEY);
@@ -125,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. Populate Issue dropdown (placeholder issues for now)
             const issues = [
-                "Other...", "New Work Order (NWO)", "New Raw Material (NRM)", "New Work Order New Material (NWNM)",
+                "Other...",
                 "Thickness (TSS)", "Strand Width (STD)", "Bond (BND)",
                 "Thickness, Strand (TNS)", "Thickness, Strand, Bond (BST)", "Edges (EDG)", "Width Varying (WIV)",
                 "Breaking Strand (BKS)", "Thick and Thin (TNT)", "Zero Max (ZEM)", "Main Flattener Roll Grinding (MFR)",
@@ -147,25 +286,6 @@ document.addEventListener('DOMContentLoaded', function() {
         issueSelect.appendChild(option);
     });
 
-    // Set current date as default for date field
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const dateInput = document.getElementById('date');
-    dateInput.value = `${year}-${month}-${day}`;
-    dateInput.readOnly = true; // Prevent user from changing the date
-
-    // Set current time as default for time field
-    const hours = String(today.getHours()).padStart(2, '0');
-    const minutes = String(today.getMinutes()).padStart(2, '0');
-    // return back if need change time - document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
-
-    // this need to coment or delete for changin time
-    const timeInput = document.getElementById('timeStartedMachine');
-    timeInput.value = `${hours}:${minutes}`;
-    timeInput.readOnly = true; // Prevent user from changing the time
-
     // Function to display messages - UNCHANGED
     function showMessage(text, type) {
         messageDiv.textContent = text;
@@ -176,36 +296,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    // Function to show confirmation overlay - MODIFIED TO NOT AUTO-LOGOUT
-    function showConfirmationOverlay(message = "REPAIR LOG SUBMITTED SUCCESSFULLY!") {
+    // Function to show confirmation overlay - UPDATED to not logout after submission
+    function showConfirmationOverlay(message = "Thank you for your submission!") {
         confirmationMessage.textContent = message;
         confirmationOverlay.style.display = 'flex';
         setTimeout(() => {
             confirmationOverlay.style.display = 'none';
-            // Show reminder message instead of logging out
-            showMessage('You are still logged in. Don\'t forget to log out after you finish your shift!', 'info');
-        }, 2500);
+            // Reset inactivity timer instead of logging out
+            resetInactivityTimer();
+        }, 3000);
     }
     
 
-    // Handle Form Submission - MODIFIED TO USE FIRESTORE
+    // Handle Form Submission - MODIFIED TO USE FIRESTORE AND CURRENT DATA
     repairForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         showMessage('Submitting data...', 'info');
 
+        // Get current date and time for submission
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const year = now.getFullYear();
+        // Format date for database as YYYY-MM-DD
+        const currentDate = `${year}-${month}-${day}`;
+        
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const currentTime = `${hours}:${minutes}`;
+        
+        const mechanicName = sessionStorage.getItem(MECHANIC_NAME_SESSION_KEY);
+
         const formData = {
-            //shift: document.getElementById('shift').value,
-            date: document.getElementById('date').value,
+            date: currentDate,
             machineNum: document.getElementById('machineNum').value,
             issue: document.getElementById('issue').value,
             description: document.getElementById('description').value,
             actionTaken: document.getElementById('actionTaken').value,
-            status: statusSelect.value,
-            mechanicNotes: mechanicNotesInput.value,
-            mechanicName: mechanicNameInput.value,
-            timeStartedMachine: document.getElementById('timeStartedMachine').value,
-            timestamp: new Date().toISOString() // NEW: Add a server-side timestamp (for sorting/ordering)
+            status: document.getElementById('status').value,
+            mechanicNotes: document.getElementById('mechanicNotes').value,
+            mechanicName: mechanicName,
+            timeStartedMachine: currentTime,
+            timestamp: new Date().toISOString() // Server-side timestamp for sorting
         };
 
         try {
@@ -219,36 +352,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             showMessage('Repair log submitted successfully!', 'success');
             
+            // Reset form but keep session active
             repairForm.reset();
-            document.getElementById('date').value = `${year}-${month}-${day}`;
-            document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`;
 
             showConfirmationOverlay(); 
             
         } catch (error) {
             console.error('Error submitting form to Firestore:', error);
             showMessage('Failed to submit repair log. Please try again. (Check console for details)', 'error');
-            // Remove auto-logout on error, just show error message
-            setTimeout(() => {
-                showMessage('', '');
-            }, 5000);
+            // Don't logout on error, just reset the timer
+            resetInactivityTimer();
         }
     });
 
-     // NEW: Logout Button Event Listener - Moved inside DOMContentLoaded
-    if (logoutButton) { // Ensure button exists before adding listener
-        logoutButton.addEventListener('click', function() {
-            // Clear the form fields upon logout
-            repairForm.reset();
-            document.getElementById('date').value = `${year}-${month}-${day}`; // Reset date
-            document.getElementById('timeStartedMachine').value = `${hours}:${minutes}`; // Reset time
-
-            // Show the PIN screen, which also clears mechanic name input and sessionStorage
-            showPinScreen();
-            // Optionally show a "Logged out" message briefly
-            showMessage('Successfully logged out.', 'success');
-            setTimeout(() => messageDiv.style.display = 'none', 2000); // Hide after 2 seconds
-        });
+     // NEW: Logout Button Event Listener
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
     }
 
     // Dark Mode Toggle

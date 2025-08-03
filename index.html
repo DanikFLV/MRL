@@ -11,8 +11,21 @@
 
 </head>
 <body>
+    <!-- Developer Signature -->
+    <div class="developer-signature">
+        <span class="dev-text">Developed by</span> <span class="name-text">DANIIL RITENKO</span>
+    </div>
+
     <div id="pin-overlay">
-        <div class="pin-container">
+        <div style="
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 80%;
+            max-width: 350px;
+        ">
             <h2 id="pin-header-text">Enter PIN</h2>
             <input type="password" id="pin-input" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
             <button id="pin-submit">Access App</button>
@@ -21,7 +34,18 @@
     </div>
 
     <div id="greeting-overlay">
-        <div class="greeting-container">
+        <div style="
+            background-color: #4CAF50;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            font-size: 2.5em;
+            font-weight: bold;
+        ">
             <span id="greeting-text">Hello Mechanic!</span>
         </div>
     </div>
@@ -34,98 +58,79 @@
     </div>
 
     <div class="container">
-        <div class="tech-grid-bg"></div>
+        <button id="logoutButton" class="logout-button">Logout</button>
         
-        <div class="header-section">
-            <div class="tech-border"></div>
-            <!-- Company Branding - Hidden for now, will reveal during presentation
-            <div class="company-branding">
-                <span class="company-name">PMRT-ITT</span>
-                <span class="company-subtitle">Professional Machine Resource Management & IT Technologies</span>
-                <span class="company-tagline">Excellence in Industrial Systems Management</span>
+        <h1>Machine Repair Log</h1>
+        
+        <!-- Static Date, Time and Mechanic Display -->
+        <div class="info-display">
+            <div class="mechanic-info">
+                <span class="mechanic-label">Welcome: </span><span id="current-mechanic"></span>
             </div>
-            -->
-            <h1><span class="tech-accent">◆</span> MACHINE REPAIR LOG <span class="tech-accent">◆</span></h1>
-            <div class="status-bar">
-                <div class="status-item">
-                    <span class="status-dot active"></span>
-                    <span>SYSTEM ONLINE</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-dot"></span>
-                    <span id="current-time"></span>
-                </div>
-                <div class="status-item">
-                    <button id="logoutButton" class="logout-button">
-                        <span class="logout-icon">⏻</span>
-                        LOGOUT
-                    </button>
-                </div>
+            <div class="date-time-info">
+                <span class="date-label">Date: </span><span id="current-date"></span>
+                <span class="time-label">Time: </span><span id="current-time"></span>
             </div>
         </div>
-        <form id="repairForm" class="tech-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="date"><span class="field-icon">📅</span>DATE:</label>
-                    <input type="date" id="date" name="date" required>
-                </div>
-                <div class="form-group">
-                    <label for="timeStartedMachine"><span class="field-icon">⏰</span>LOG TIME:</label>
-                    <input type="time" id="timeStartedMachine" name="timeStartedMachine" required>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="mechanicName"><span class="field-icon">👤</span>MECHANIC NAME:</label>
-                <input type="text" id="mechanicName" name="mechanicName" placeholder="Enter Technician ID" required>
-            </div>
+        <!-- Session Status Reminder -->
+        <div id="session-reminder" class="session-reminder" style="display: none;">
+            You're still in the system, don't forget to log out!
+        </div>
+        
+        <form id="repairForm">
+            <!-- Hidden fields for data that was previously in form -->
+            <input type="hidden" id="date" name="date">
+            <input type="hidden" id="mechanicName" name="mechanicName">
+            <input type="hidden" id="timeStartedMachine" name="timeStartedMachine">
+            
+            <!-- Removed Date, Mechanic Name, and Log Time fields -->
             
            
 
             <div class="form-row">
-                <div class="form-group">
-                    <label for="machineNum"><span class="field-icon">🔧</span>MACHINE #:</label>
+                <div class="form-group half-width">
+                    <label for="machineNum">Machine #:</label>
                     <select id="machineNum" name="machineNum" required>
                         <option value="">Select Machine</option>
-                    </select>
+                        </select>
                 </div>
-                <div class="form-group">
-                    <label for="status"><span class="field-icon">📊</span>STATUS:</label>
+
+                <div class="form-group half-width">
+                    <label for="status">Status:</label>
                     <select id="status" name="status" required>
                         <option value="">Select Status</option>
                         <option value="Fixed">Fixed</option>
                         <option value="Need Further Repair">Need Further Repair</option>
+                        <option value="UNRESOLVED">UNRESOLVED</option>
                         <option value="Shop">Shop</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="issue"><span class="field-icon">⚠️</span>ISSUE TYPE:</label>
+                <label for="issue">Issue:</label>
                 <select id="issue" name="issue" required>
                     <option value="">Select Issue</option>
-                </select>
+                    </select>
             </div>
 
             <div class="form-group" id="descriptionGroup">
-                <label for="description"><span class="field-icon">📝</span>ISSUE DESCRIPTION:</label>
-                <textarea id="description" name="description" rows="3" placeholder="Describe the technical issue in detail..." required></textarea>
+                <label for="description">Description (related to issue):</label>
+                <textarea id="description" name="description" rows="3" placeholder="Describe the issue in detail..." required></textarea>
             </div>
 
             <div class="form-group">
-                <label for="actionTaken"><span class="field-icon">🔨</span>ACTION TAKEN:</label>
-                <textarea id="actionTaken" name="actionTaken" rows="4" placeholder="Detail the repair procedures and solutions implemented..." ></textarea>
+                <label for="actionTaken">Action Taken:</label>
+                <textarea id="actionTaken" name="actionTaken" rows="4" placeholder="Describe the actions taken to fix the machine..." ></textarea>
             </div>
 
             <div class="form-group">
-                <label for="mechanicNotes"><span class="field-icon">📋</span>TECHNICAL NOTES:</label>
-                <textarea id="mechanicNotes" name="mechanicNotes" rows="3" placeholder="Additional notes, parts needed, or recommendations..."></textarea>
+                <label for="mechanicNotes">Mechanic Notes (Optional):</label>
+                <textarea id="mechanicNotes" name="mechanicNotes" rows="3" placeholder="Enter any notes or parts needed here..."></textarea>
             </div>
 
-            <button type="submit" class="submit-button">
-                <span class="button-text">SUBMIT REPAIR LOG</span>
-                <span class="button-arrow">▶</span>
-            </button>
+            <button type="submit" class="submit-button">Submit Repair</button>
             <div id="message" class="message"></div>
         </form>
     </div>
@@ -152,30 +157,8 @@ const db = getFirestore(app);
   window.getDoc = getDoc;
   window.collection = collection;
   window.addDoc = addDoc;
-
-  // Update current time display
-  function updateTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-    document.getElementById('current-time').textContent = timeString;
-  }
-  
-  // Update immediately and then every second
-  updateTime();
-  setInterval(updateTime, 1000);
 </script>
     <script src="script.js"></script>
-
-    <!-- Developer Credit -->
-    <div class="developer-credit">
-        <span class="dev-text">Developed by</span>
-        <span class="dev-name">DANIIL RITENKO</span>
-    </div>
 
 </body>
 </html>
